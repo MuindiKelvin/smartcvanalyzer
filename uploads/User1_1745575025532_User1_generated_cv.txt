@@ -1,0 +1,20 @@
+
+Curriculum Vitae
+================
+Name: Kelvin Muindi
+Email: kevinmuindi10@gmail.com
+Phone: 0704230589
+
+Education
+---------
+bachelor of science 
+
+Experience
+----------
+Developer at company X
+
+Skills
+------
+Python, Java, MySQL, etc
+================
+    

@@ -1,0 +1,21 @@
+
+Curriculum Vitae
+================
+Name: Kelvin Muindi
+Email: kelvinmuindi10@gmail.com
+Phone: 0704230589
+
+Education
+---------
+BSc in Computer Science, XYZ University, 2018-2022
+
+Experience
+----------
+Software Engineer at ABC Corp, 2022-Present
+
+
+Skills
+------
+Java, Python, SQL, Spring Boot
+================
+    

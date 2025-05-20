@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - JackBoys</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .dashboard-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            background: white;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background: linear-gradient(90deg, #0288d1 0%, #0277bd 100%);
+            color: white;
+            font-weight: 500;
+            border-bottom: none;
+            padding: 1rem;
+        }
+        .btn-primary {
+            background: #0288d1;
+            border: none;
+            transition: background 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: #0277bd;
+        }
+        .btn-success {
+            background: #43a047;
+            border: none;
+        }
+        .btn-success:hover {
+            background: #388e3c;
+        }
+        .btn-warning {
+            background: #fb8c00;
+            border: none;
+        }
+        .btn-warning:hover {
+            background: #f57c00;
+        }
+        .btn-danger {
+            background: #d32f2f;
+            border: none;
+        }
+        .btn-danger:hover {
+            background: #c62828;
+        }
+        .modal-content {
+            border-radius: 15px;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .job-details {
+            display: none;
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 0 0 15px 15px;
+        }
+        .search-container {
+            position: relative;
+            max-width: 400px;
+            margin-bottom: 1.5rem;
+        }
+        .search-container input {
+            padding-left: 2.5rem;
+            border-radius: 25px;
+            border: 1px solid #0288d1;
+        }
+        .search-container i {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #0288d1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-primary mb-4"> JackBoys Admin Dashboard</h1>
+        <button class="btn btn-secondary mb-4" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
+
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link" id="cv-tab" data-bs-toggle="tab" href="#cv-approval" role="tab"><i class="bi bi-file-earmark-check"></i> CV Approval</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="users-tab" data-bs-toggle="tab" href="#manage-users" role="tab"><i class="bi bi-people"></i> Manage Users</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="jobs-tab" data-bs-toggle="tab" href="#manage-jobs" role="tab"><i class="bi bi-briefcase"></i> Manage Jobs</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" id="applications-tab" data-bs-toggle="tab" href="#manage-applications" role="tab"><i class="bi bi-list-ul"></i> Manage Applications</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="candidates-tab" data-bs-toggle="tab" href="#rank-candidates" role="tab"><i class="bi bi-award"></i> Rank Candidates</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="activity-tab" data-bs-toggle="tab" href="#activity-log" role="tab"><i class="bi bi-clock-history"></i> Activity Log</a>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="adminTabContent">
+            <!-- CV Approval -->
+            <div class="tab-pane fade" id="cv-approval" role="tabpanel">
+                <h3>CV Approval</h3>
+                <ul class="list-group" id="cvList">
+                    <!-- CVs will be populated here -->
+                </ul>
+                <div id="cvPreview" class="mt-3 p-3 border rounded" style="display: none; max-height: 300px; overflow-y: auto;">
+                    <h5>CV Content:</h5>
+                    <pre id="cvText"></pre>
+                </div>
+            </div>
+
+            <!-- Manage Users -->
+            <div class="tab-pane fade" id="manage-users" role="tabpanel">
+                <h3>Manage Users</h3>
+                <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createUserModal"><i class="bi bi-person-plus"></i> Create User</button>
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userList">
+                        <!-- Users will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Manage Jobs -->
+            <div class="tab-pane fade" id="manage-jobs" role="tabpanel">
+                <h3>Manage Jobs</h3>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createJobModal">
+                        <i class="bi bi-plus-circle"></i> Create Job
+                    </button>
+                    <div class="search-container">
+                        <i class="bi bi-search"></i>
+                        <input type="text" class="form-control" id="jobSearch" placeholder="Search jobs..." onkeyup="filterJobs()">
+                    </div>
+                </div>
+                <div id="jobList" class="row">
+                    <!-- Jobs will be populated here -->
+                </div>
+            </div>
+
+            <!-- Manage Applications -->
+            <div class="tab-pane fade show active" id="manage-applications" role="tabpanel">
+                <h3>Manage Applications</h3>
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>User</th>
+                            <th>Job</th>
+                            <th>CV Path</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                            <th>Candidates</th>
+                        </tr>
+                    </thead>
+                    <tbody id="applicationList">
+                        <!-- Applications will be populated here -->
+                    </tbody>
+                </table>
+                <!-- Candidates Modal -->
+                <div class="modal fade" id="viewCandidatesModal" tabindex="-1" aria-labelledby="viewCandidatesModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="viewCandidatesModalLabel">Candidates for Job</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <ul class="list-group" id="candidatesForJobList">
+                                    <!-- Candidates will be populated here -->
+                                </ul>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rank Candidates -->
+            <div class="tab-pane fade" id="rank-candidates" role="tabpanel">
+                <h3>Rank Candidates</h3>
+                <div class="mb-3">
+                    <label for="jobSelectCandidates" class="form-label">Select Job:</label>
+                    <select class="form-select" id="jobSelectCandidates" onchange="loadCandidates()">
+                        <option value="" disabled selected>Select a job</option>
+                    </select>
+                </div>
+                <ul class="list-group" id="candidateList">
+                    <!-- Candidates will be populated here -->
+                </ul>
+            </div>
+
+            <!-- Activity Log -->
+            <div class="tab-pane fade" id="activity-log" role="tabpanel">
+                <h3>Activity Log</h3>
+                <ul class="list-group" id="activityLog">
+                    <!-- Activity log will be populated here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create User Modal -->
+    <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createUserModalLabel">Create User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="createUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="createUsername" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="createEmail" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="createPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createRole" class="form-label">Role</label>
+                        <select class="form-select" id="createRole" required>
+                            <option value="ROLE_USER">User</option>
+                            <option value="ROLE_ADMIN">Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="createUser()">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update User Modal -->
+    <div class="modal fade" id="updateUserModal" tabindex="-1" aria-labelledby="updateUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateUserModalLabel">Update User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="updateUserId">
+                    <div class="mb-3">
+                        <label for="updateUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="updateUsername" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="updateEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="updateEmail" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="updateRole" class="form-label">Role</label>
+                        <select class="form-select" id="updateRole" required>
+                            <option value="ROLE_USER">User</option>
+                            <option value="ROLE_ADMIN">Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="updateUser()">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Job Modal -->
+    <div class="modal fade" id="createJobModal" tabindex="-1" aria-labelledby="createJobModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createJobModalLabel">Create Job</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="createJobDescription" class="form-label">Description</label>
+                        <input type="text" class="form-control" id="createJobDescription" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createJobDetailedDescription" class="form-label">Detailed Description</label>
+                        <textarea class="form-control" id="createJobDetailedDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createJobCriteria" class="form-label">Criteria</label>
+                        <textarea class="form-control" id="createJobCriteria" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="createJob()">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Job Modal -->
+    <div class="modal fade" id="updateJobModal" tabindex="-1" aria-labelledby="updateJobModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateJobModalLabel">Update Job</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="updateJobId">
+                    <div class="mb-3">
+                        <label for="updateJobDescription" class="form-label">Description</label>
+                        <input type="text" class="form-control" id="updateJobDescription" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="updateJobDetailedDescription" class="form-label">Detailed Description</label>
+                        <textarea class="form-control" id="updateJobDetailedDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="updateJobCriteria" class="form-label">Criteria</label>
+                        <textarea class="form-control" id="updateJobCriteria" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="updateJob()">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/admin-dashboard.js"></script>
+    <script src="/js/login.js"></script>
+</body>
+</html>
